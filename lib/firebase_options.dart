@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:tamir_kolay/utils/constants/api_keys.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -14,6 +15,8 @@ import 'package:flutter/foundation.dart'
 ///   options: DefaultFirebaseOptions.currentPlatform,
 /// );
 /// ```
+///
+
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -46,8 +49,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBGp5hS9TAxmhsH196b-ceRm70pC346L3M',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: ApiKeys().webFirebaseApi,
     appId: '1:1017673690753:web:067617ee0588cc54766780',
     messagingSenderId: '1017673690753',
     projectId: 'tamir-kolay-3c428',
@@ -57,8 +60,8 @@ class DefaultFirebaseOptions {
     measurementId: 'G-1G2WYZNS67',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCg8MAIvtEah9NWP_lVo44xii6Q7Ndi890',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: ApiKeys().androidFirebaseApi,
     appId: '1:1017673690753:android:4f5549c0a0ddc3ed766780',
     messagingSenderId: '1017673690753',
     projectId: 'tamir-kolay-3c428',
@@ -66,8 +69,8 @@ class DefaultFirebaseOptions {
     storageBucket: 'tamir-kolay-3c428.appspot.com',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBtsnfB8rQnJxVGH61fsP7kOpNOz3cMN4w',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: ApiKeys().iosFirebaseApi,
     appId: '1:1017673690753:ios:abcb54c1e7e2c877766780',
     messagingSenderId: '1017673690753',
     projectId: 'tamir-kolay-3c428',
