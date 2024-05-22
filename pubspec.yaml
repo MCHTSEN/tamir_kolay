@@ -1,14 +1,34 @@
 name: tamir_kolay
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: ">=3.3.4 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
+  cloud_firestore: ^4.17.3
+  equatable: ^2.0.5
+  firebase_auth: ^4.19.5
+  firebase_core: ^2.31.0
+  firebase_storage: ^11.7.5
+  firebase_ui_auth: ^1.14.0
+  flutter_dotenv: ^5.1.0
+  flutter_riverpod: ^2.5.1
+  gap: ^3.0.1
+  google_fonts: 6.1.0
+  image_picker: ^1.1.1
+  kartal: ^3.5.0
+  mockito: ^5.4.4
+  responsive_sizer: ^3.3.0+1
+  riverpod: ^2.5.1
+  rxdart: ^0.27.7
+  shared_preferences: ^2.2.3
+  test: ^1.24.9
+  wolt_modal_sheet: ^0.5.0
 
 dev_dependencies:
   flutter_test:

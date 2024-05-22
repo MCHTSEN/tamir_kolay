@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1017673690753",
+    "firebase_url": "https://tamir-kolay-3c428-default-rtdb.firebaseio.com",
+    "project_id": "tamir-kolay-3c428",
+    "storage_bucket": "tamir-kolay-3c428.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017673690753:android:4f5549c0a0ddc3ed766780",
+        "android_client_info": {
+          "package_name": "com.example.tamir_kolay"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg8MAIvtEah9NWP_lVo44xii6Q7Ndi890"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
