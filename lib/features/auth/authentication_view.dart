@@ -17,7 +17,12 @@ class AuthenticationView extends ConsumerStatefulWidget {
 class _AuthenticationViewState extends ConsumerState<AuthenticationView> {
   @override
   Widget build(BuildContext context) {
-    print(FirebaseAuth.instance.currentUser?.uid ?? 'dsadas');
+    print(FirebaseAuth.instance.currentUser?.uid ?? 'no uid');
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      return const HomeView();
+    }
+
     return Scaffold(
         body: firebase.FirebaseUIActions(
             actions: [
