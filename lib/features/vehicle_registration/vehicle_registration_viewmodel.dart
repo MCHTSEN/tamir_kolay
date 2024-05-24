@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tamir_kolay/features/vehicle_registration/vehicle_registration_view.dart';
 import 'package:tamir_kolay/models/job_model.dart';
+import 'package:tamir_kolay/providers/works_provider.dart';
 import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
 import 'package:uuid/uuid.dart';
 
@@ -48,15 +50,15 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
 
   Future<void> submitForm() async {
     DateTime now = DateTime.now();
-    final randomID = uuid.v4();
-
+    final randomIdForWork = uuid.v4();
+    final userID = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     DocumentReference documentReference =
         firestore.collection('vehicle_registrations').doc('works');
 
     // Set the data for the document
     final json = Work(
-      id: randomID,
+      id: randomIdForWork,
       brand: brandController.text,
       model: modelController.text,
       modelYear: modelYearController.text,
@@ -75,15 +77,12 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
 
     inspect(json);
 
-    await documentReference
-        .collection(licensePlateController.text)
-        .doc(randomID)
-        .set(json);
+    await documentReference.collection(userID).doc(randomIdForWork).set(json);
 
     // Navigator.of(context).pop();
   }
 
-  Future<dynamic> showCustomDialog() {
+  Future<dynamic> showCustomDialog(WidgetRef ref) {
     return showDialog(
       barrierDismissible: false,
       context: context,
@@ -93,9 +92,12 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
           content: const Text('Araç kaydı başarıyla oluşturuldu.'),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
+
+                await ref.read(workProvider.notifier).getWorks();
+                
               },
               child: const Text('Bitir'),
             ),

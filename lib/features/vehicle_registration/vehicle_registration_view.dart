@@ -154,7 +154,7 @@ class _VehicleRegistrationViewState
                     /// TODO change this to if (viewModel.formKey.currentState!.validate()) {
                     if (formKey.currentState!.validate()) {
                       submitForm.call();
-                      showCustomDialog();
+                      showCustomDialog(ref);
                     }
                   },
                   child: const Text(submitButtonLabel),
