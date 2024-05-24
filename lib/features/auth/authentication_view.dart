@@ -5,6 +5,7 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tamir_kolay/features/home/home_view.dart';
+import 'package:tamir_kolay/features/vehicle_registration/vehicle_registration_view.dart';
 
 class AuthenticationView extends ConsumerStatefulWidget {
   const AuthenticationView({super.key});
