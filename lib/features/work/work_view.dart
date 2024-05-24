@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,6 +11,8 @@ import 'package:kartal/kartal.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:tamir_kolay/features/work/work_viewmodel.dart';
 import 'package:tamir_kolay/models/job_model.dart';
+import 'package:tamir_kolay/providers/works_provider.dart';
+import 'package:tamir_kolay/service/firebase_service.dart';
 import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
 import 'package:tamir_kolay/utils/theme/color_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,8 +38,9 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
 
   @override
   Widget build(BuildContext context) {
-    final generalTextTheme = context.general.textTheme.bodyLarge!
-        .copyWith(fontSize: 18, color: Theme.of(context).colorScheme.secondary);
+    print('workModel: ${widget.workModel.expense}');
+    final generalTextTheme = context.general.textTheme.bodyLarge!.copyWith(
+        fontSize: 16.8.sp, color: Theme.of(context).colorScheme.secondary);
     final work = widget.workModel;
 
     return Scaffold(
@@ -73,6 +77,9 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                           flex: 2,
                           child: TextField(
                             controller: addExpenseAmountController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
                             decoration: InputDecoration(
                               contentPadding:
                                   const EdgeInsets.symmetric(horizontal: 6),
@@ -119,7 +126,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                             )),
                       ],
                     ),
-                    Gap(2.h),
+                    Gap(1.h),
                     if (expenses.isNotEmpty)
                       ListView.builder(
                         shrinkWrap: true,
@@ -128,12 +135,15 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                         itemBuilder: (context, index) {
                           return Row(
                             children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                child: Text(
-                                  '${expenses[index].amount} ₺',
-                                  style: generalTextTheme.copyWith(
-                                      color: Colors.black),
+                              SizedBox(
+                                width: 20.w,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    '${expenses[index].amount} ₺',
+                                    style: generalTextTheme.copyWith(
+                                        color: Colors.black),
+                                  ),
                                 ),
                               ),
                               Padding(
@@ -173,7 +183,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                               Icons.done,
                               color: Colors.white,
                             ),
-                            label: const Text(' Bitir',
+                            label: const Text('Bitir',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white)),
@@ -184,7 +194,16 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                       child: Padding(
                         padding: context.padding.low,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            work.task = tasks;
+                            work.expense = expenses;
+                            work.totalAmount = expenses
+                                .map((e) => e.amount!)
+                                .reduce((value, element) => value + element);
+
+                            ref.read(workProvider.notifier).updateWork(work);
+                            FirebaseService.instance.updateWork(work);
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -402,9 +421,18 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                   width: 1.5,
                 ),
               ),
-              child: Text(
-                "${work.customerPhone}".toUpperCase(),
-                style: generalTextTheme.copyWith(fontSize: 15.sp),
+              child: Row(
+                children: [
+                  Text(
+                    "${work.customerPhone}".toUpperCase(),
+                    style: generalTextTheme.copyWith(fontSize: 15.sp),
+                  ),
+                  Gap(1.w),
+                  const Icon(
+                    Icons.call,
+                    size: 13,
+                  ),
+                ],
               ),
             ),
           ),

@@ -29,7 +29,23 @@ class FirebaseService {
       // Hata durumunda boş bir liste döndür
       return works;
     }
-
     return works;
+  }
+
+  Future<void> updateWork(Work work) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    try {
+      await firestore
+          .collection('vehicle_registrations')
+          .doc('works')
+          .collection(userId)
+          .doc(work.id)
+          .update(work.toJson());
+      print('FirebaseService: updateWork triggered.');
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
   }
 }

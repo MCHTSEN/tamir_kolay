@@ -73,6 +73,7 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
       status: VehicleStatus.waiting.name,
       isPaid: false,
       totalAmount: 0,
+      
     ).toJson();
 
     inspect(json);

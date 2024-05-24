@@ -20,4 +20,8 @@ class WorkNotifier extends StateNotifier<List<Work>> {
   void addWork(Work work) {
     state = [...state, work];
   }
+
+  void updateWork(Work work) {
+    state = state.map((e) => e.id == work.id ? work : e).toList();
+  }
 }

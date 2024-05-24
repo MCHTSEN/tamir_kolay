@@ -42,13 +42,13 @@ class Work {
   String get statusToString {
     switch (status) {
       case 'waiting':
-        return 'Beklemede';
+        return 'Yeni Kayıt';
       case 'inProgress':
         return 'Devam Ediyor';
       case 'done':
         return 'Tamamlandı';
       default:
-        return 'Beklemede';
+        return 'Yeni Kayıt';
     }
   }
 
@@ -107,8 +107,8 @@ class Work {
       'createTime': createTime,
       'endTime': endTime,
       'status': status,
-      'tasks': task?.map((task) => task.toJson()).toList(),
-      'expenses': expense?.map((expense) => expense.toJson()).toList(),
+      'task': task?.map((task) => task.toJson()).toList(),
+      'expense': expense?.map((expense) => expense.toJson()).toList(),
       'isPaid': isPaid,
       'totalAmount': totalAmount,
     };
