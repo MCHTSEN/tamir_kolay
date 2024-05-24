@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:tamir_kolay/features/auth/authentication_view.dart';
+import 'package:tamir_kolay/features/bussiness/bussiness_view.dart';
 import 'package:tamir_kolay/features/home/home_view.dart';
 import 'package:tamir_kolay/features/payment/payment_view.dart';
 import 'package:tamir_kolay/features/vehicle_registration/vehicle_registration_view.dart';
@@ -37,6 +38,8 @@ class MainApp extends StatelessWidget {
             '/payment': (context) => const PaymentView(),
             '/registration': (context) => const VehicleRegistrationView(),
             '/home': (context) => const HomeView(),
+            '/auth': (context) => const AuthenticationView(),
+            '/bussiness': (context) => const BussinessView(),
           },
           theme:
               (brightness == Brightness.light) ? theme.light() : theme.dark(),
