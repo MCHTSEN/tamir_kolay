@@ -1,3 +1,5 @@
+import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
+
 class Work {
   String? id;
   String? brand;
@@ -36,6 +38,19 @@ class Work {
     this.isPaid,
     this.totalAmount,
   });
+
+  String get statusToString {
+    switch (status) {
+      case 'waiting':
+        return 'Beklemede';
+      case 'inProgress':
+        return 'Devam Ediyor';
+      case 'done':
+        return 'Tamamlandı';
+      default:
+        return 'Beklemede';
+    }
+  }
 
   Work copyWith({
     String? id,
