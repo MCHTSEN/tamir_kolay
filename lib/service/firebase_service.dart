@@ -23,7 +23,6 @@ class FirebaseService {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         works.add(Work.fromJson(data));
       }
-      print('FirebaseService: getAllWorks triggered.');
     } catch (e) {
       print("Hata oluştu: $e");
       // Hata durumunda boş bir liste döndür

@@ -38,7 +38,6 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
 
   @override
   Widget build(BuildContext context) {
-    print('workModel: ${widget.workModel.expense}');
     final generalTextTheme = context.general.textTheme.bodyLarge!.copyWith(
         fontSize: 16.8.sp, color: Theme.of(context).colorScheme.secondary);
     final work = widget.workModel;
@@ -255,7 +254,6 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                   if (addTaskController.text.isNotEmpty) {
                     tasks.add(Task(
                         description: addTaskController.text, isDone: false));
-                    print(tasks);
                     addTaskController.clear();
                     setState(() {});
                   }
@@ -288,7 +286,6 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                     value: tasks[index].isDone,
                     onChanged: (value) {
                       tasks[index].isDone = value!;
-                      print(tasks[index].isDone);
                       setState(() {});
                     },
                   ),
