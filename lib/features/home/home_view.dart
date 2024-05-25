@@ -1,16 +1,12 @@
-import 'dart:developer';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:kartal/kartal.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:tamir_kolay/features/vehicle_registration/vehicle_registration_view.dart';
 import 'package:tamir_kolay/features/work/work_view.dart';
 import 'package:tamir_kolay/models/job_model.dart';
 import 'package:tamir_kolay/providers/works_provider.dart';
-import 'package:tamir_kolay/service/firebase_service.dart';
 import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
 
 class HomeView extends ConsumerStatefulWidget {
