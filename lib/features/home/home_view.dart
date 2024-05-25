@@ -26,35 +26,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
     VehicleStatus.done.name
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    getWorks();
-  }
-
   Future<void> getWorks() async {
-    await ref.read(workProvider.notifier).getWorks();
+    ref.read(workProvider.notifier).getWorks();
+    print('getWorks triggered.');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/bussiness');
-            },
-            icon: const Icon(Icons.home_work)),
-        title: const Text("Tamir Kolay"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushNamed(context, '/auth');
-            },
-          ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/bussiness');
+              },
+              icon: const Icon(Icons.home_work)),
         ],
+        title: const Text("Tamir Kolay"),
       ),
       body: Padding(
         padding: context.padding.low,
@@ -115,9 +103,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   ListView _workCards() {
     return ListView.builder(
-      itemCount: ref.watch(workProvider).length,
+      itemCount: ref.read(workProvider).length,
       itemBuilder: (context, index) {
-        final work = ref.watch(workProvider)[index];
+        final work = ref.read(workProvider)[index];
         return _tabName[_selectedIndex] != work.status
             ? const SizedBox()
             : GestureDetector(

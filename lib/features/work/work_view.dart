@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +55,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _brandAndStatus(work, context),
+                    const Gap(5),
                     _plateAndPhone(work, generalTextTheme, context),
                     Gap(2.h),
                     _problemText(generalTextTheme),
@@ -177,7 +180,67 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: Container(
+                                      padding: EdgeInsets.all(6.w),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'İşçilik Ücreti Giriniz',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineSmall!
+                                                .copyWith(fontSize: 18.sp),
+                                          ),
+                                          Gap(2.h),
+                                          TextField(
+                                            controller: addLabourCostController,
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly
+                                            ],
+                                            decoration: InputDecoration(
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15),
+                                              suffix: const Text('₺'),
+                                              label: const Text('Tutar'),
+                                              hintStyle: generalTextTheme,
+                                            ),
+                                          ),
+                                          Gap(2.h),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              if (addLabourCostController
+                                                  .text.isNotEmpty) {
+                                                FirebaseService.instance
+                                                    .addLabourCost(
+                                                        work.id!,
+                                                        double.parse(
+                                                            addLabourCostController
+                                                                .text));
+                                                Navigator.pop(context);
+                                              }
+                                            },
+                                            child: const Text('Kaydet'),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                              // FirebaseService.instance
+                              //     .updateStatus(work.id!, VehicleStatus.done);
+                              // work.status = VehicleStatus.done.name;
+                              // ref.read(workProvider.notifier).updateWork(work);
+                              setState(() {});
+                            },
                             icon: const Icon(
                               Icons.done,
                               color: Colors.white,
@@ -226,12 +289,20 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                         child: Padding(
                           padding: context.padding.low,
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              FirebaseService.instance.updateStatus(
+                                  work.id!, VehicleStatus.inProgress);
+                              work.status = VehicleStatus.inProgress.name;
+                              ref.read(workProvider.notifier).updateWork(work);
+                              setState(() {});
+                            },
                             icon: const Icon(
                               Icons.refresh_outlined,
+                              color: Colors.black,
                             ),
                             label: const Text(
                               'Sonraki Adım',
+                              style: TextStyle(color: Colors.black),
                             ),
                           ),
                         ),
@@ -368,16 +439,46 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
         ]);
   }
 
-  Padding _plateAndPhone(
+  Row _plateAndPhone(
       Work work, TextStyle generalTextTheme, BuildContext context) {
     const insidePadding = EdgeInsets.symmetric(horizontal: 5, vertical: 1);
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          padding: insidePadding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.grey,
+              width: 1.5,
+            ),
+          ),
+          child: Text(
+            "${work.plate}".toUpperCase(),
+            style: generalTextTheme.copyWith(fontSize: 15.sp),
+          ),
+        ),
+        Gap(5.w),
+        InkWell(
+          onTap: () async {
+            Clipboard.setData(ClipboardData(text: work.customerPhone!));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                content: Center(
+                    child: Text(
+                  'Numara kopyalandı!',
+                  style: generalTextTheme.copyWith(color: Colors.white),
+                )),
+              ),
+            );
+          },
+          child: Container(
             padding: insidePadding,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -386,55 +487,22 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                 width: 1.5,
               ),
             ),
-            child: Text(
-              "${work.plate}".toUpperCase(),
-              style: generalTextTheme.copyWith(fontSize: 15.sp),
+            child: Row(
+              children: [
+                Text(
+                  "${work.customerPhone}".toUpperCase(),
+                  style: generalTextTheme.copyWith(fontSize: 15.sp),
+                ),
+                Gap(1.w),
+                const Icon(
+                  Icons.call,
+                  size: 13,
+                ),
+              ],
             ),
           ),
-          Gap(5.w),
-          InkWell(
-            onTap: () async {
-              Clipboard.setData(ClipboardData(text: work.customerPhone!));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  content: Center(
-                      child: Text(
-                    'Numara kopyalandı!',
-                    style: generalTextTheme.copyWith(color: Colors.white),
-                  )),
-                ),
-              );
-            },
-            child: Container(
-              padding: insidePadding,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 1.5,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    "${work.customerPhone}".toUpperCase(),
-                    style: generalTextTheme.copyWith(fontSize: 15.sp),
-                  ),
-                  Gap(1.w),
-                  const Icon(
-                    Icons.call,
-                    size: 13,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

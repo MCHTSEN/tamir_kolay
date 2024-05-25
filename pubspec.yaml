@@ -22,6 +22,7 @@ dependencies:
   gap: ^3.0.1
   google_fonts: 6.1.0
   image_picker: ^1.1.1
+  intl: ^0.18.1
   json_annotation: ^4.9.0
   kartal: ^3.5.0
   mockito: ^5.4.4

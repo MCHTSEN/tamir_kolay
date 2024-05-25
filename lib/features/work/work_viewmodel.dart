@@ -6,6 +6,7 @@ mixin WorkViewModel on State<WorkView> {
   final TextEditingController addTaskController= TextEditingController();
   final TextEditingController addExpenseAmountController= TextEditingController(); 
   final TextEditingController addExpenseDetailController= TextEditingController(); 
+  final TextEditingController addLabourCostController= TextEditingController();
   final List<Work> _works = [];
   List<Work> get works => _works;
 }

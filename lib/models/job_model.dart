@@ -19,6 +19,7 @@ class Work {
   bool? isPaid;
   int? totalAmount;
 
+
   Work({
     this.id,
     this.brand,
