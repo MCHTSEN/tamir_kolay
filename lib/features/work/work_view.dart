@@ -16,6 +16,7 @@ import 'package:tamir_kolay/models/job_model.dart';
 import 'package:tamir_kolay/providers/works_provider.dart';
 import 'package:tamir_kolay/service/firebase_service.dart';
 import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
+import 'package:tamir_kolay/utils/extensions/double_extension.dart';
 import 'package:tamir_kolay/utils/theme/color_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -41,11 +42,32 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
   @override
   Widget build(BuildContext context) {
     final generalTextTheme = context.general.textTheme.bodyLarge!.copyWith(
-        fontSize: 16.8.sp, color: Theme.of(context).colorScheme.secondary);
+        fontSize: 14.sp, color: Theme.of(context).colorScheme.secondary);
     final work = widget.workModel;
 
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          actions: [
+            Container(
+              margin: EdgeInsets.only(right: 3.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _getStatusColor(work.status!),
+                  width: 1.5,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Text(
+                work.statusToString,
+                style: TextStyle(
+                  color: _getStatusColor(work.status!),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          ],
+        ),
         body: Stack(
           children: [
             SingleChildScrollView(
@@ -64,102 +86,10 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                     _tasksText(generalTextTheme),
                     _tasks(generalTextTheme),
                     Gap(2.h),
-                    Text(
-                      "Giderler",
-                      style: generalTextTheme.copyWith(
-                          fontSize: 18.5.sp,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Gap(2.w),
-                        Expanded(
-                          flex: 2,
-                          child: TextField(
-                            controller: addExpenseAmountController,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 6),
-                              suffix: const Text('₺'),
-                              label: const Text('Tutar'),
-                              hintStyle: generalTextTheme,
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        Gap(2.w),
-                        Expanded(
-                          flex: 7,
-                          child: TextField(
-                            controller: addExpenseDetailController,
-                            decoration: InputDecoration(
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 6),
-                                hintText: 'Detaylari giriniz',
-                                hintStyle: generalTextTheme,
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none),
-                          ),
-                        ),
-                        Gap(2.w),
-                        IconButton(
-                            onPressed: () {
-                              if (addExpenseAmountController.text.isNotEmpty &&
-                                  addExpenseDetailController.text.isNotEmpty) {
-                                expenses.add(Expense(
-                                    amount: int.parse(
-                                        addExpenseAmountController.text),
-                                    description:
-                                        addExpenseDetailController.text));
-                                addExpenseAmountController.clear();
-                                addExpenseDetailController.clear();
-                                setState(() {});
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.add_circle_outline_sharp,
-                              size: 30,
-                            )),
-                      ],
-                    ),
+                    _expensesText(generalTextTheme),
+                    _addExpense(generalTextTheme),
                     Gap(1.h),
-                    if (expenses.isNotEmpty)
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: expenses.length,
-                        itemBuilder: (context, index) {
-                          return Row(
-                            children: [
-                              SizedBox(
-                                width: 20.w,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    '${expenses[index].amount} ₺',
-                                    style: generalTextTheme.copyWith(
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 3.w),
-                                child: Text(
-                                  expenses[index].description.toString(),
-                                  style: generalTextTheme.copyWith(
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                    if (expenses.isNotEmpty) _expenses(generalTextTheme),
                     Gap(10.h)
                   ],
                 ),
@@ -180,6 +110,14 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                             ),
+                            icon: const Icon(
+                              Icons.done,
+                              color: Colors.white,
+                            ),
+                            label: const Text('Bitir',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
                             onPressed: () {
                               showDialog(
                                 context: context,
@@ -215,16 +153,27 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                                           ),
                                           Gap(2.h),
                                           ElevatedButton(
-                                            onPressed: () {
+                                            onPressed: () async {
                                               if (addLabourCostController
                                                   .text.isNotEmpty) {
-                                                FirebaseService.instance
+                                                await FirebaseService.instance
                                                     .addLabourCost(
                                                         work.id!,
                                                         double.parse(
                                                             addLabourCostController
                                                                 .text));
+
+                                                await FirebaseService.instance
+                                                    .updateStatus(work.id!,
+                                                        VehicleStatus.done);
+
+                                                work.status =
+                                                    VehicleStatus.done.name;
+                                                ref
+                                                    .read(workProvider.notifier)
+                                                    .updateWork(work);
                                                 Navigator.pop(context);
+                                                setState(() {});
                                               }
                                             },
                                             child: const Text('Kaydet'),
@@ -235,20 +184,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                                   );
                                 },
                               );
-                              // FirebaseService.instance
-                              //     .updateStatus(work.id!, VehicleStatus.done);
-                              // work.status = VehicleStatus.done.name;
-                              // ref.read(workProvider.notifier).updateWork(work);
-                              setState(() {});
                             },
-                            icon: const Icon(
-                              Icons.done,
-                              color: Colors.white,
-                            ),
-                            label: const Text('Bitir',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
                           ),
                         ),
                       ),
@@ -315,6 +251,103 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
         ));
   }
 
+  Text _expensesText(TextStyle generalTextTheme) {
+    return Text(
+      "Giderler",
+      style: generalTextTheme.copyWith(
+          fontSize: 17.sp, fontWeight: FontWeight.w500, color: Colors.black),
+    );
+  }
+
+  Row _addExpense(TextStyle generalTextTheme) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Gap(2.w),
+        Expanded(
+          flex: 2,
+          child: TextField(
+            keyboardType: TextInputType.number,
+            controller: addExpenseAmountController,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 6),
+              suffix: const Text('₺'),
+              label: const Text('Tutar'),
+              hintStyle: generalTextTheme,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+            ),
+          ),
+        ),
+        Gap(2.w),
+        Expanded(
+          flex: 7,
+          child: TextField(
+            controller: addExpenseDetailController,
+            decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 6),
+                hintText: 'Detaylari giriniz',
+                hintStyle: generalTextTheme,
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none),
+          ),
+        ),
+        Gap(2.w),
+        IconButton(
+            onPressed: () {
+              if (addExpenseAmountController.text.isNotEmpty &&
+                  addExpenseDetailController.text.isNotEmpty) {
+                expenses.add(Expense(
+                    amount: int.parse(addExpenseAmountController.text),
+                    description: addExpenseDetailController.text));
+                addExpenseAmountController.clear();
+                addExpenseDetailController.clear();
+                setState(() {});
+              }
+            },
+            icon: const Icon(
+              Icons.add_circle_outline_sharp,
+              size: 30,
+            )),
+      ],
+    );
+  }
+
+  ListView _expenses(TextStyle generalTextTheme) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: expenses.length,
+      itemBuilder: (context, index) {
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 30.w,
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  '${expenses[index].amount!.toDouble().toCurrency()} ₺',
+                  style: generalTextTheme.copyWith(color: Colors.black),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 3.w),
+                child: Text(
+                  expenses[index].description.toString(),
+                  style: generalTextTheme.copyWith(color: Colors.black),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Column _tasks(TextStyle generalTextTheme) {
     return Column(
       children: [
@@ -352,6 +385,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
             itemCount: tasks.length,
             itemBuilder: (context, index) {
               return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Checkbox(
                     value: tasks[index].isDone,
@@ -360,11 +394,13 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                       setState(() {});
                     },
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2.w),
-                    child: Text(
-                      tasks[index].description.toString(),
-                      style: generalTextTheme.copyWith(color: Colors.black),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2.w),
+                      child: Text(
+                        tasks[index].description.toString(),
+                        style: generalTextTheme.copyWith(color: Colors.black),
+                      ),
                     ),
                   ),
                 ],
@@ -379,7 +415,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
     return Text(
       "Yapılan İşlemler",
       style: generalTextTheme.copyWith(
-          fontSize: 18.5.sp, fontWeight: FontWeight.w500, color: Colors.black),
+          fontSize: 17.sp, fontWeight: FontWeight.w500, color: Colors.black),
     );
   }
 
@@ -397,46 +433,22 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
   Text _problemText(TextStyle generalTextTheme) {
     return Text("Sorun",
         style: generalTextTheme.copyWith(
-            fontSize: 18.5.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black));
+            fontSize: 17.sp, fontWeight: FontWeight.w500, color: Colors.black));
   }
 
   Row _brandAndStatus(Work work, BuildContext context) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            '${work.model}',
-            style: context.general.textTheme.headlineLarge!
-                .copyWith(fontWeight: FontWeight.w600, fontSize: 22.sp),
-          ),
-          Gap(1.w),
-          Text(
-            '/${work.brand}',
-            style:
-                context.general.textTheme.bodyLarge!.copyWith(fontSize: 18.sp),
-          ),
-          const Spacer(),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _getStatusColor(work.status!),
-                width: 1.5,
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Text(
-              work.statusToString,
-              style: TextStyle(
-                color: _getStatusColor(work.status!),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          )
-        ]);
+    return Row(children: [
+      Text(
+        '${work.model}',
+        style: context.general.textTheme.headlineLarge!
+            .copyWith(fontWeight: FontWeight.w600, fontSize: 22.sp),
+      ),
+      Gap(1.w),
+      Text(
+        '/${work.brand}',
+        style: context.general.textTheme.bodyLarge!.copyWith(fontSize: 18.sp),
+      ),
+    ]);
   }
 
   Row _plateAndPhone(
@@ -457,7 +469,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
           ),
           child: Text(
             "${work.plate}".toUpperCase(),
-            style: generalTextTheme.copyWith(fontSize: 15.sp),
+            style: generalTextTheme.copyWith(fontSize: 14.sp),
           ),
         ),
         Gap(5.w),
@@ -491,7 +503,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
               children: [
                 Text(
                   "${work.customerPhone}".toUpperCase(),
-                  style: generalTextTheme.copyWith(fontSize: 15.sp),
+                  style: generalTextTheme.copyWith(fontSize: 14.sp),
                 ),
                 Gap(1.w),
                 const Icon(

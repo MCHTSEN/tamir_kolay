@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:gap/gap.dart';
 import 'package:kartal/kartal.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:tamir_kolay/features/home/home_viewmodel.dart';
 import 'package:tamir_kolay/features/work/work_view.dart';
 import 'package:tamir_kolay/models/job_model.dart';
 import 'package:tamir_kolay/providers/works_provider.dart';
@@ -16,9 +18,7 @@ class HomeView extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends ConsumerState<HomeView> {
-  int _selectedIndex = 0;
-  int selectedTab = 2;
+class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
   final List<String> _tabs = ["Devam Eden", "Yeni", "Biten"];
   final List<String> _tabName = [
     VehicleStatus.inProgress.name,
@@ -44,60 +44,46 @@ class _HomeViewState extends ConsumerState<HomeView> {
         ],
         title: const Text("Tamir Kolay"),
       ),
-      body: Padding(
-        padding: context.padding.low,
-        child: Column(
-          children: [
-            _statusChips(),
-            FutureBuilder(
-              future: getWorks(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator.adaptive());
-                }
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Bir hata oluştu. Lütfen tekrar deneyin.'),
+      body: LiquidPullToRefresh(
+        springAnimationDurationInMilliseconds: 400,
+          showChildOpacityTransition: false,
+          color: Theme.of(context).colorScheme.primary,
+        onRefresh: () async {
+          await getWorks();
+        },
+        child: Padding(
+          padding: context.padding.low,
+          child: Column(
+            children: [
+              _statusChips(),
+              FutureBuilder(
+                future: getWorks(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child: CircularProgressIndicator.adaptive());
+                  }
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: Text('Bir hata oluştu. Lütfen tekrar deneyin.'),
+                    );
+                  }
+                  if (snapshot.hasData) {
+                    return const Center(
+                      child:
+                          Text('Henüz bir işlem yok.\n Hadi ise başlayalım!'),
+                    );
+                  }
+                  return Expanded(
+                    child: _workCards(),
                   );
-                }
-                if (snapshot.hasData) {
-                  return const Center(
-                    child: Text('Henüz bir işlem yok.\n Hadi ise başlayalım!'),
-                  );
-                }
-                return Expanded(
-                  child: _workCards(),
-                );
-              },
-            )
-          ],
+                },
+              )
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'Ödemeler'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Kayıt Aç'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Anasayfa'),
-        ],
-        currentIndex: selectedTab,
-        onTap: (index) {
-          print('index: $index selectedIndex: $_selectedIndex');
-          if (index != selectedTab) {
-            switch (index) {
-              case 0:
-                Navigator.pushNamed(context, '/payment');
-                break;
-              case 1:
-                Navigator.pushNamed(context, '/registration');
-                break;
-              case 2:
-                Navigator.pushNamed(context, '/home');
-                break;
-            }
-          }
-        },
-      ),
+      bottomNavigationBar: HomeBottomNavBar(context),
     );
   }
 
@@ -106,7 +92,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       itemCount: ref.read(workProvider).length,
       itemBuilder: (context, index) {
         final work = ref.read(workProvider)[index];
-        return _tabName[_selectedIndex] != work.status
+        return _tabName[selectedIndex] != work.status
             ? const SizedBox()
             : GestureDetector(
                 onTap: () {
@@ -128,6 +114,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -148,15 +135,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Row _brandAndModel(Work work, BuildContext context) {
-    return Row(
+  Column _brandAndModel(Work work, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '${work.model}'.toUpperCase(),
           style: context.general.textTheme.headlineMedium!
-              .copyWith(fontWeight: FontWeight.w600, fontSize: 19.sp),
+              .copyWith(fontWeight: FontWeight.w600, fontSize: 18.sp),
         ),
-        Gap(1.w),
+        // Gap(1.w),
         Text(
           work.brand.toString(),
           style: context.general.textTheme.bodyLarge!.copyWith(fontSize: 15.sp),
@@ -168,7 +156,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   Text _issue(Work work, BuildContext context) {
     return Text(
       work.issue.toString(),
-      style: context.general.textTheme.bodyLarge!.copyWith(fontSize: 16.sp),
+      style: context.general.textTheme.bodyLarge!.copyWith(fontSize: 14.sp),
     );
   }
 
@@ -211,10 +199,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
           padding: const EdgeInsets.only(left: 8.0),
           child: FilterChip(
             label: Text(_tabs[index]),
-            selected: _selectedIndex == index,
+            selected: selectedIndex == index,
             onSelected: (selected) {
               setState(() {
-                _selectedIndex =
+                selectedIndex =
                     selected ? index : 0; // set to null when not selected
               });
             },
