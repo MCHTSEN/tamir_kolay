@@ -30,7 +30,9 @@ mixin PaymentViewModel on State<PaymentView> {
             child: Text('Alınan Ödeme: \n ${totalPaidAmount.toCurrency()}₺',
                 textAlign: TextAlign.center,
                 style: generalTextTheme.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.w600)),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15.sp)),
           )),
           const VerticalDivider(
             color: Colors.white,
@@ -42,11 +44,12 @@ mixin PaymentViewModel on State<PaymentView> {
                     'Bekleyen Ödeme: \n ${(totalAmount - totalPaidAmount).toCurrency()}₺',
                     textAlign: TextAlign.center,
                     style: generalTextTheme.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.w600))),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15.sp))),
           ),
         ],
       ),
     );
   }
-  
 }

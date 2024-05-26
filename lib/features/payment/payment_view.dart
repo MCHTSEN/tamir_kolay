@@ -208,7 +208,7 @@ class _PaymentViewState extends ConsumerState<PaymentView>
                         },
                       ),
                       Text(
-                        'Toplam Ödeme: ${currentWork.totalAmount}₺',
+                        'Toplam Ödeme: ${currentWork.totalAmount!.toDouble().toCurrency()}₺',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16.sp,

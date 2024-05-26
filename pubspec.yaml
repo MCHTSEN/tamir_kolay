@@ -25,6 +25,7 @@ dependencies:
   intl: ^0.18.1
   json_annotation: ^4.9.0
   kartal: ^3.5.0
+  liquid_pull_to_refresh: ^3.0.1
   mockito: ^5.4.4
   responsive_sizer: ^3.3.0+1
   riverpod: ^2.5.1
