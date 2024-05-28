@@ -7,6 +7,8 @@ mixin HomeViewModel on ConsumerState<HomeView> {
   int selectedTab = 2;
   BottomNavigationBar HomeBottomNavBar(BuildContext context) {
     return BottomNavigationBar(
+      selectedIconTheme:
+          IconThemeData(color: Theme.of(context).colorScheme.secondary),
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'Ödemeler'),
         BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Kayıt Aç'),
@@ -14,7 +16,6 @@ mixin HomeViewModel on ConsumerState<HomeView> {
       ],
       currentIndex: selectedTab,
       onTap: (index) {
-        print('index: $index selectedIndex: $selectedIndex');
         if (index != selectedTab) {
           switch (index) {
             case 0:

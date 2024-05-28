@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:gap/gap.dart';
@@ -25,9 +26,14 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
     VehicleStatus.waiting.name,
     VehicleStatus.done.name
   ];
+  @override
+  void initState() {
+    super.initState();
+    getWorks();
+  }
 
   Future<void> getWorks() async {
-    ref.read(workProvider.notifier).getWorks();
+    await ref.read(workProvider.notifier).getWorks();
     print('getWorks triggered.');
   }
 
@@ -46,8 +52,8 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
       ),
       body: LiquidPullToRefresh(
         springAnimationDurationInMilliseconds: 400,
-          showChildOpacityTransition: false,
-          color: Theme.of(context).colorScheme.primary,
+        showChildOpacityTransition: false,
+        color: Theme.of(context).colorScheme.primary,
         onRefresh: () async {
           await getWorks();
         },
@@ -88,12 +94,14 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
   }
 
   ListView _workCards() {
+    final works = ref.read(workProvider);
     return ListView.builder(
-      itemCount: ref.read(workProvider).length,
+      itemCount: works.length,
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        final work = ref.read(workProvider)[index];
+        final work = works[index];
         return _tabName[selectedIndex] != work.status
-            ? const SizedBox()
+            ? const SizedBox.shrink()
             : GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -109,24 +117,40 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
                   margin: const EdgeInsets.all(8),
                   padding: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.onPrimary,
                     border: Border.all(color: Colors.grey, width: 1),
                     borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _brandAndModel(work, context),
-                          const Spacer(),
-                          _statusAndDate(work, context),
-                        ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.4),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
                       ),
-                      Gap(1.h),
-                      _issue(work, context),
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                          flex: 5,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _brandAndModel(work, context),
+                              Gap(1.h),
+                              _issue(work, context),
+                            ],
+                          )),
+                      Expanded(
+                          flex: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              _statusAndDate(work, context),
+                            ],
+                          )),
                     ],
                   ),
                 ),
@@ -135,18 +159,18 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
     );
   }
 
-  Column _brandAndModel(Work work, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Row _brandAndModel(Work work, BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           '${work.model}'.toUpperCase(),
           style: context.general.textTheme.headlineMedium!
               .copyWith(fontWeight: FontWeight.w600, fontSize: 18.sp),
         ),
-        // Gap(1.w),
+        Gap(1.w),
         Text(
-          work.brand.toString(),
+          work.plate.toString(),
           style: context.general.textTheme.bodyLarge!.copyWith(fontSize: 15.sp),
         ),
       ],
@@ -166,6 +190,7 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
       children: [
         Container(
           decoration: BoxDecoration(
+            color: _getStatusColor(work.status!),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _getStatusColor(work.status!),
@@ -177,7 +202,7 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
             work.statusToString,
             style: TextStyle(
               fontSize: 13.sp,
-              color: _getStatusColor(work.status!),
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -198,7 +223,16 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
         (index) => Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: FilterChip(
-            label: Text(_tabs[index]),
+            checkmarkColor: Colors.white,
+            color: MaterialStateColor.resolveWith((states) =>
+                selectedIndex == index
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(context).colorScheme.onPrimary),
+            label: Text(
+              _tabs[index],
+              style: TextStyle(
+                  color: selectedIndex == index ? Colors.white : Colors.black),
+            ),
             selected: selectedIndex == index,
             onSelected: (selected) {
               setState(() {
@@ -217,7 +251,7 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
       case 'waiting':
         return Theme.of(context).colorScheme.primary;
       case 'done':
-        return Theme.of(context).colorScheme.tertiary;
+        return Theme.of(context).colorScheme.onTertiary;
       case 'inProgress':
         return Theme.of(context).colorScheme.secondary;
       default:
