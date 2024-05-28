@@ -13,12 +13,12 @@ class MaterialTheme {
       onPrimary: Color(0xffffffff),
       primaryContainer: Color(0xffd6e3ff),
       onPrimaryContainer: Color(0xff001b3e),
-      secondary: Color(0xff565f71),
-      onSecondary: Color(0xffffffff),
-      secondaryContainer: Color(0xffdae2f9),
-      onSecondaryContainer: Color(0xff131c2b),
-      tertiary: Color(0xff705575),
-      onTertiary: Color(0xffffffff),
+      secondary: Color(0xff3e6bff), //
+      onSecondary: Color(0xff181818), //
+      secondaryContainer: Color(0xffc2cbe0),
+      onSecondaryContainer: Color(0xff000000),
+      tertiary: Color(0xffffd466), //
+      onTertiary: Color(0xff1A4D2E),
       tertiaryContainer: Color(0xfffad8fd),
       onTertiaryContainer: Color(0xff28132e),
       error: Color(0xffba1a1a),
@@ -292,11 +292,11 @@ class MaterialTheme {
       onPrimary: Color(0xff000000),
       primaryContainer: Color(0xffb1cbff),
       onPrimaryContainer: Color(0xff000000),
-      secondary: Color(0xfffbfaff),
-      onSecondary: Color(0xff000000),
+      secondary: Color(0xff3e6bff), //
+      onSecondary: Color(0xff181818), //
       secondaryContainer: Color(0xffc2cbe0),
       onSecondaryContainer: Color(0xff000000),
-      tertiary: Color(0xfffff9fa),
+      tertiary: Color(0xffffd466), //
       onTertiary: Color(0xff000000),
       tertiaryContainer: Color(0xffe1c0e5),
       onTertiaryContainer: Color(0xff000000),
@@ -363,12 +363,10 @@ class MaterialTheme {
         useMaterial3: true,
         brightness: colorScheme.brightness,
         colorScheme: colorScheme,
-        
         textTheme: textTheme.apply(
           bodyColor: colorScheme.onSurface,
           displayColor: colorScheme.onSurface,
         ),
-        
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
