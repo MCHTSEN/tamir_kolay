@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,11 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:tamir_kolay/features/bussiness/bussiness_viewmodel.dart';
 import 'package:tamir_kolay/providers/works_provider.dart';
 import 'package:tamir_kolay/utils/extensions/double_extension.dart';
+import 'package:tamir_kolay/utils/widgets/buttons/sign_out_button.dart';
+import 'package:tamir_kolay/utils/widgets/charts/custom_chart.dart';
+import 'package:tamir_kolay/utils/widgets/containers/basic_info_card.dart';
+import 'package:tamir_kolay/utils/widgets/containers/clickable_info_container.dart';
+import 'package:tamir_kolay/utils/widgets/listiles/custom_listile.dart';
 
 class BussinessView extends ConsumerStatefulWidget {
   const BussinessView({super.key});
@@ -16,111 +23,121 @@ class BussinessView extends ConsumerStatefulWidget {
 }
 
 class _BussinessViewState extends ConsumerState<BussinessView>
-    with BussinessViewModel {
+    with BussinessViewModel, SingleTickerProviderStateMixin {
   bool isClickedEarnedMoney = false;
+
   @override
   Widget build(BuildContext context) {
     final works = ref.read(workProvider);
     initialize(works);
     return Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushNamed(context, '/auth');
-              },
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
+        body: Stack(
+      children: [
+        Container(
+          height: 50.h,
+          width: 100.w,
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+              color: Theme.of(context).colorScheme.secondary),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Tamir Kolay',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
-              const Text('İşletme Hesabı',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              ListTile(
-                onTap: () => Navigator.pushNamed(context, '/customers'),
-                title: const Text('Musteriler',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                trailing: IconButton(
-                    onPressed: () {}, icon: const Icon(Icons.chevron_right)),
-              ),
-              const Divider(),
-              Gap(2.h),
-              const Text('Aylık İstatistikler',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              Gap(2.h),
-              CustomContainer(
-                title: "Kazanç",
-                value: '${totalEarnedMoney.toDouble().toCurrency()}₺',
-                onTap: () {
-                  setState(() {
-                    print('Kazanç tıklandı');
-                    isClickedEarnedMoney = !isClickedEarnedMoney;
-                  });
-                },
-              ),
-              isClickedEarnedMoney
-                  ? const Column(
-                      children: [
-                        // Text('Gelir: ${totalEarnedMoney.toDouble().toCurrency()}₺'),
-                      ],
-                    )
-                  : const SizedBox.shrink(),
-              Gap(2.h),
-              CustomContainer(
-                  title: 'Tamamlanan İş ', value: totalCompletedWorks),
-            ],
+            children: [Gap(6.h), _homeAndSignout(context), _charts()],
           ),
-        ));
+        ),
+        Container(
+          margin: EdgeInsets.only(top: 40.h),
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30), topRight: Radius.circular(30))),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: BasicInfoCard(
+                        width: 45.w,
+                        text: 'Ortalama İş Bitirme Süresi',
+                        text2: '$avarageHourToWorkDone saat',
+                        icon: Icons.timelapse_sharp,
+                      ),
+                    ),
+                    Gap(4.w),
+                    Expanded(
+                        child: BasicInfoCard(
+                      width: 45.w,
+                      text: 'Günlük Kazanç',
+                      text2: '$dailyEarnedMoney₺',
+                      icon: Icons.monetization_on_sharp,
+                    )),
+                  ],
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Text('❋ Kazanç detayları için tıklayın',
+                      style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500)),
+                ),
+                const Divider(),
+                const CustomListTile(
+                  title: 'Müşteriler',
+                  pushName: '/customers',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ));
   }
-}
 
-class CustomContainer extends StatelessWidget {
-  const CustomContainer({
-    super.key,
-    required this.title,
-    required this.value,
-    this.onTap,
-  });
-  final String title;
-  final String value;
-  final Function()? onTap;
+  Row _charts() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CustomChart(
+          height: 3.h,
+          title: 'Tamamlanan İş',
+          value: totalCompletedWorks,
+        ),
+        Gap(5.w),
+        CustomChart(
+            title: 'Aylık Kazanç',
+            value: '${lastMonthEarnedMoney.toCurrency()}₺',
+            height: 0),
+        Gap(5.w),
+        CustomChart(
+          title: 'Tüm Zamanlar',
+          value: '${totalEarnedMoney.toCurrency()}₺',
+          height: 4.h,
+        ),
+      ],
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).secondaryHeaderColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: Colors.black,
-            width: 2,
-          ),
+  Row _homeAndSignout(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/home');
+            },
+            icon: const Icon(
+              Icons.home,
+              color: Colors.white,
+            )),
+        const SignoutButton(
+          color: Colors.white,
         ),
-        child: Row(
-          children: [
-            Gap(5.w),
-            Text(title,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-            const Spacer(),
-            Text(value,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-            Gap(5.w),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }
