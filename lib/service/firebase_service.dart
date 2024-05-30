@@ -31,6 +31,54 @@ class FirebaseService {
     return works;
   }
 
+  Future<void> updateEndTime(
+    String workId,
+  ) async {
+    try {
+      await firestore
+          .collection('vehicle_registrations')
+          .doc('works')
+          .collection(userId)
+          .doc(workId)
+          .update({'endTime': DateTime.now().toString()});
+      print('FirebaseService: updateEndTime triggered.');
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
+  }
+
+  Future<void> updateExpenses(
+      {required List<Expense> expenses, required String workId}) async {
+    try {
+      await firestore
+          .collection('vehicle_registrations')
+          .doc('works')
+          .collection(userId)
+          .doc(workId)
+          .update({
+        'expense': expenses.map((expense) => expense.toJson()).toList()
+      });
+      print('FirebaseService: updateExpenses triggered.');
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
+  }
+
+  Future<void> updateTasks(
+      {required List<Task> tasks, required String workId}) async {
+    try {
+      await firestore
+          .collection('vehicle_registrations')
+          .doc('works')
+          .collection(userId)
+          .doc(workId)
+          .update({'task': tasks.map((tasks) => tasks.toJson()).toList()});
+      print('FirebaseService: updateExpenses triggered.');
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
+  }
+
   Future<void> updateWork(Work work) async {
     try {
       await firestore
