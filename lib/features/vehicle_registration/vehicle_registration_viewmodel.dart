@@ -14,25 +14,39 @@ import 'package:uuid/uuid.dart';
 
 // CarFormViewModel sınıfı
 mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
+  final String appBarTitle = 'Araç Kayıt Formu';
+  final String brandLabel = 'Marka';
+  final String modelLabel = 'Model';
+  final String modelYearLabel = 'Model Yılı';
+  final String licensePlateLabel = 'Plaka';
+  final String tcNoLabel = 'Müşteri Tc Kimlik No';
+  final String customerNameLabel = 'Müşteri Adı Soyadı';
+  final String customerPhoneLabel = 'Müşteri Telefon';
+  final String customerPhoneHint = '05XX XXX XX XX';
+  final String issueLabel = 'Yaşanılan Sorun';
+  final String mileageLabel = 'Kilometre';
+  final String submitButtonLabel = 'Kayıt Aç';
+
   var uuid = const Uuid();
   final TextEditingController brandController =
-      TextEditingController(text: 'Audi');
+      TextEditingController(text: 'Kawasaki');
   final TextEditingController modelController =
-      TextEditingController(text: 'Model');
+      TextEditingController(text: 'Ninja H2R');
   final TextEditingController modelYearController =
       TextEditingController(text: '2022');
   final TextEditingController customerNameController =
-      TextEditingController(text: 'John Doe');
+      TextEditingController(text: 'Mucahit SEN');
   final TextEditingController customerPhoneController =
-      TextEditingController(text: '12345678901');
-  final TextEditingController issueController =
-      TextEditingController(text: 'Some issue');
+      TextEditingController(text: '05050161116');
+  final TextEditingController issueController = TextEditingController(
+      text:
+          'Motor ilk çalışmada hemen mars almiyor. Calistiktan sonra 5-10 dk sonra mars aliyor. Ayrica zincirden ses geliyor.');
   final TextEditingController licensePlateController =
-      TextEditingController(text: 'ABC123');
+      TextEditingController(text: '16 HR 016');
   final TextEditingController mileageController =
-      TextEditingController(text: '10000');
+      TextEditingController(text: '1300');
   final TextEditingController tcNoController =
-      TextEditingController(text: '12345678901');
+      TextEditingController(text: '28165339568');
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   void dispose() {
@@ -48,7 +62,7 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
     super.dispose();
   }
 
-  Future<void> submitForm() async {
+  Future<void> submitForm(WidgetRef ref) async {
     DateTime now = DateTime.now();
     final randomIdForWork = uuid.v4();
     final userID = FirebaseAuth.instance.currentUser!.uid;
@@ -73,9 +87,8 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
       status: VehicleStatus.waiting.name,
       isPaid: false,
       totalAmount: 0,
-      
     ).toJson();
-
+    ref.read(workProvider.notifier).addWork(Work.fromJson(json));
     inspect(json);
 
     await documentReference.collection(userID).doc(randomIdForWork).set(json);
@@ -94,11 +107,9 @@ mixin VehicleRegistrationViewModel on State<VehicleRegistrationView> {
           actions: [
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-
                 await ref.read(workProvider.notifier).getWorks();
-                
+
+                Navigator.of(context).pushNamed('/home');
               },
               child: const Text('Bitir'),
             ),

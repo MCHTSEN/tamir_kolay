@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,6 +65,7 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
           child: Column(
             children: [
               _statusChips(),
+              Gap(0.5.h),
               FutureBuilder(
                 future: getWorks(),
                 builder: (context, snapshot) {
@@ -97,7 +101,7 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
     final works = ref.read(workProvider);
     return ListView.builder(
       itemCount: works.length,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       itemBuilder: (context, index) {
         final work = works[index];
         return _tabName[selectedIndex] != work.status
@@ -114,42 +118,93 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
                   );
                 },
                 child: Container(
-                  margin: const EdgeInsets.all(8),
-                  padding: EdgeInsets.all(4.w),
+                  margin: EdgeInsets.only(bottom: 1.h),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.onPrimary,
-                    border: Border.all(color: Colors.grey, width: 1),
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.4),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 227, 227, 227),
+                        width: 1.5),
+                    borderRadius: BorderRadius.circular(25),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Stack(
                     children: [
-                      Expanded(
-                          flex: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _brandAndModel(work, context),
-                              Gap(1.h),
-                              _issue(work, context),
-                            ],
-                          )),
-                      Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              _statusAndDate(work, context),
-                            ],
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                flex: 5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _brandAndModel(work, context),
+                                    Gap(1.h),
+                                    _issue(work, context),
+                                  ],
+                                )),
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  // _statusAndDate(work, context),
+                                  // const SizedBox(height: 8),
+                                  Gap(3.h),
+                                  CircleAvatar(
+                                    backgroundColor:
+                                        _getStatusColor((work.status!)),
+                                    radius: 20,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => WorkView(
+                                              workModel: work,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.arrow_forward_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: _getStatusColor(work.status!),
+                              borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(25),
+                                  bottomLeft: Radius.circular(8),
+                                  topLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8)),
+                              border: Border.all(
+                                color: _getStatusColor(work.status!),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Text(
+                              work.statusToString,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           )),
                     ],
                   ),

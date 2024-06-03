@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tamir_kolay/features/home/home_view.dart';
 
 mixin HomeViewModel on ConsumerState<HomeView> {
-  int selectedIndex = 0;
+  int selectedIndex = 1;
   int selectedTab = 2;
   BottomNavigationBar HomeBottomNavBar(BuildContext context) {
     return BottomNavigationBar(

@@ -18,22 +18,9 @@ class _VehicleRegistrationViewState
     with VehicleRegistrationViewModel {
   @override
   Widget build(BuildContext context) {
-    const String appBarTitle = 'Araç Kayıt Formu';
-    const String brandLabel = 'Marka';
-    const String modelLabel = 'Model';
-    const String modelYearLabel = 'Model Yılı';
-    const String licensePlateLabel = 'Plaka';
-    const String tcNoLabel = 'Müşteri Tc Kimlik No';
-    const String customerNameLabel = 'Müşteri Adı Soyadı';
-    const String customerPhoneLabel = 'Müşteri Telefon';
-    const String customerPhoneHint = '05XX XXX XX XX';
-    const String issueLabel = 'Yaşanılan Sorun';
-    const String mileageLabel = 'Kilometre';
-    const String submitButtonLabel = 'Kayıt Aç';
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(appBarTitle),
+        title: Text(appBarTitle),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -48,7 +35,7 @@ class _VehicleRegistrationViewState
                     Expanded(
                       child: TextFormField(
                         controller: brandController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: brandLabel,
                         ),
                         validator: Validators.brandValidator,
@@ -58,7 +45,7 @@ class _VehicleRegistrationViewState
                     Expanded(
                       child: TextFormField(
                         controller: modelController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: modelLabel,
                         ),
                         validator: Validators.modelValidator,
@@ -73,7 +60,7 @@ class _VehicleRegistrationViewState
                     Expanded(
                       child: TextFormField(
                         controller: modelYearController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: modelYearLabel,
                         ),
                         keyboardType: TextInputType.number,
@@ -87,7 +74,7 @@ class _VehicleRegistrationViewState
                     Expanded(
                       child: TextFormField(
                         controller: licensePlateController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: licensePlateLabel,
                         ),
                         validator: Validators.licensePlateValidator,
@@ -98,7 +85,7 @@ class _VehicleRegistrationViewState
                 const Gap(10),
                 TextFormField(
                   controller: tcNoController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: tcNoLabel,
                   ),
                   validator: Validators.tcNoValidator,
@@ -109,7 +96,7 @@ class _VehicleRegistrationViewState
                 const Gap(10),
                 TextFormField(
                   controller: customerNameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: customerNameLabel,
                   ),
                   validator: Validators.customerNameValidator,
@@ -117,7 +104,7 @@ class _VehicleRegistrationViewState
                 const Gap(10),
                 TextFormField(
                   controller: customerPhoneController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: customerPhoneLabel,
                     hintText: customerPhoneHint,
                   ),
@@ -130,7 +117,7 @@ class _VehicleRegistrationViewState
                 const Gap(10),
                 TextFormField(
                   controller: issueController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: issueLabel,
                   ),
                   validator: Validators.issueValidator,
@@ -138,7 +125,7 @@ class _VehicleRegistrationViewState
                 const Gap(10),
                 TextFormField(
                   controller: mileageController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: mileageLabel,
                   ),
                   validator: Validators.mileageValidator,
@@ -153,11 +140,11 @@ class _VehicleRegistrationViewState
                   onPressed: () {
                     /// TODO change this to if (viewModel.formKey.currentState!.validate()) {
                     if (formKey.currentState!.validate()) {
-                      submitForm.call();
+                      submitForm.call(ref);
                       showCustomDialog(ref);
                     }
                   },
-                  child: const Text(submitButtonLabel),
+                  child: Text(submitButtonLabel),
                 ),
               ],
             ),
