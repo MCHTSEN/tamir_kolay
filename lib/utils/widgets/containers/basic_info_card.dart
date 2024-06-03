@@ -38,6 +38,10 @@ class BasicInfoCard extends StatelessWidget {
                       text,
                       textAlign: TextAlign.center,
                     ),
+                    const Divider(
+                      indent: 12,
+                      endIndent: 12,
+                    ),
                     Text(text2,
                         textAlign: TextAlign.center,
                         style: TextStyle(

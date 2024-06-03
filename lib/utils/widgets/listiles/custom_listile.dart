@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 
 class CustomListTile extends StatelessWidget {
   final String title;
-  final String pushName;
+  final Function()? onTap;
   const CustomListTile({
     super.key,
     required this.title,
-    required this.pushName,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () => Navigator.pushNamed(context, pushName),
+      onTap: onTap,
       title: Text(title,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-      trailing: IconButton(
-          onPressed: () => Navigator.pushNamed(context, pushName),
-          icon: const Icon(Icons.chevron_right)),
+      trailing:
+          IconButton(onPressed: onTap, icon: const Icon(Icons.chevron_right)),
     );
   }
 }

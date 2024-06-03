@@ -28,7 +28,7 @@ class _CustomChartState extends ConsumerState<CustomChart>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
     _animation =
