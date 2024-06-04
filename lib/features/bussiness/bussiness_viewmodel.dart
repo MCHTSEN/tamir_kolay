@@ -4,42 +4,41 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tamir_kolay/features/bussiness/bussiness_view.dart';
 import 'package:tamir_kolay/models/job_model.dart';
 import 'package:tamir_kolay/providers/works_provider.dart';
+import 'package:tamir_kolay/service/firebase_service.dart';
 import 'package:tamir_kolay/utils/enums/date_type.dart';
 
 mixin BussinessViewModel on ConsumerState<BussinessView> {
   double totalEarnedMoney = 0;
-  double totalExpenses = 0;
-  double lastWeekEarnedMoney = 0;
   double lastMonthEarnedMoney = 0;
   String totalCompletedWorks = '0';
   double avarageHourToWorkDone = 0;
   double dailyEarnedMoney = 0;
+  String avarageHourToWorkDoneAsString = '';
+  Map<String, double> monthlyRate = {};
+  double mounthlyEarnedMoney = 0;
+  double mounthlyWorksDone = 0;
+  double weeklyRate = 0;
 
-  void initialize(List<Work> works) {
+  Future<void> initialize(List<Work> works) async {
     final works = ref.read(workProvider);
-    totalEarnedMoney = works
-        .map((e) => e.totalAmount!)
-        .reduce((value, element) => value + element)
-        .toDouble();
 
-    totalExpenses = works
-        .map((e) => e.totalAmount!)
-        .reduce((value, element) => value + element)
-        .toDouble();
+    totalCompletedWorks = calculateTotalCompletedWorks(works);
 
-    totalCompletedWorks = works
-        .where((element) => element.status == 'done')
-        .toList()
-        .length
-        .toString();
+    totalEarnedMoney = calculatedtotalEarnedMoney(works);
 
     lastMonthEarnedMoney = calculateLastMonthEarnedMoney(works);
 
-    lastWeekEarnedMoney = calculateLastWeekEarnedMoney(works);
-
     avarageHourToWorkDone = calculateAvarageHourToWorkDone(works);
 
+    avarageHourToWorkDoneAsString = avarageHourToWorkDone.toStringAsFixed(2);
+
     dailyEarnedMoney = calculateDailyEarnedMoney(works);
+
+    monthlyRate = await FirebaseService.instance.compareMonthlyAmounts();
+
+    mounthlyEarnedMoney = monthlyRate['compareEarnedAmount'] ?? 0;
+    mounthlyWorksDone = monthlyRate['compareWorksCount'] ?? 0;
+    setState(() {});
   }
 
   bool isWithinGivenDate(
@@ -67,6 +66,19 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
     return givenDate.isAfter(oneMonthAgo) && givenDate.isBefore(now);
   }
 
+  String calculateTotalCompletedWorks(List<Work> works) {
+    final filteredWorks =
+        works.where((element) => element.status == 'done').toList();
+
+    if (filteredWorks.isEmpty) return '0';
+
+    return works
+        .where((element) => element.status == 'done')
+        .toList()
+        .length
+        .toString();
+  }
+
   double calculateDailyEarnedMoney(List<Work> works) {
     final filteredWorks = works
         .where((element) =>
@@ -82,17 +94,10 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
         .toDouble();
   }
 
-  double calculateLastWeekEarnedMoney(List<Work> works) {
-    final filteredWorks = works
-        .where((element) =>
-            element.status == 'done' &&
-            isWithinGivenDate(element.endTime ?? '', DateType.lastWeek))
-        .toList();
-
-    // Eğer filteredWorks boş ise, toplam kazanç 0 olarak ayarlanır
-    if (filteredWorks.isEmpty) {
-      return 0.0;
-    }
+  double calculatedtotalEarnedMoney(List<Work> works) {
+    final filteredWorks =
+        works.where((element) => element.status == 'done').toList();
+    if (filteredWorks.isEmpty) return 0.0;
 
     return filteredWorks
         .map((e) => e.totalAmount!)
@@ -104,7 +109,7 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
     final filteredWorks = works
         .where((element) =>
             element.status == 'done' &&
-            isWithinGivenDate(element.endTime ?? '', DateType.lastMonth))
+            isSameMonth(element.endTime ?? '', DateTime.now().toString()))
         .toList();
 
     // Eğer filteredWorks boş ise, toplam kazanç 0 olarak ayarlanır
@@ -132,7 +137,7 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
 
     for (var work in filteredWorks) {
       totalHours +=
-          calculateHourDifference(work.endTime ?? '', work.createTime ?? '');
+          calculateHourDifference(work.createTime ?? '', work.endTime ?? '');
     }
 
     return totalHours / filteredWorks.length;
@@ -148,12 +153,21 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
   }
 
   bool isSameDay(String dateTimeString1, String dateTimeString2) {
-    if(dateTimeString1.isEmpty) return false;
+    if (dateTimeString1.isEmpty) return false;
     DateTime dateTime1 = DateTime.parse(dateTimeString1);
     DateTime dateTime2 = DateTime.parse(dateTimeString2);
 
     return dateTime1.year == dateTime2.year &&
         dateTime1.month == dateTime2.month &&
         dateTime1.day == dateTime2.day;
+  }
+
+  bool isSameMonth(String dateTimeString1, String dateTimeString2) {
+    if (dateTimeString1.isEmpty) return false;
+    DateTime dateTime1 = DateTime.parse(dateTimeString1);
+    DateTime dateTime2 = DateTime.parse(dateTimeString2);
+
+    return dateTime1.year == dateTime2.year &&
+        dateTime1.month == dateTime2.month;
   }
 }
