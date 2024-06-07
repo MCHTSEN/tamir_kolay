@@ -18,7 +18,7 @@ class Work {
   List<Expense>? expense;
   bool? isPaid;
   int? totalAmount;
-
+  int? lobourCost;
 
   Work({
     this.id,
@@ -38,6 +38,7 @@ class Work {
     this.expense,
     this.isPaid,
     this.totalAmount,
+    this.lobourCost,
   });
 
   String get statusToString {
@@ -71,6 +72,7 @@ class Work {
     List<Expense>? expense,
     bool? isPaid,
     int? totalAmount,
+    int? lobourCost,
   }) {
     return Work(
       id: id ?? this.id,
@@ -90,6 +92,7 @@ class Work {
       expense: expense ?? this.expense,
       isPaid: isPaid ?? this.isPaid,
       totalAmount: totalAmount ?? this.totalAmount,
+      lobourCost: lobourCost ?? this.lobourCost,
     );
   }
 
@@ -112,6 +115,7 @@ class Work {
       'expense': expense?.map((expense) => expense.toJson()).toList(),
       'isPaid': isPaid,
       'totalAmount': totalAmount,
+      'lobourCost': lobourCost,
     };
   }
 
@@ -138,6 +142,7 @@ class Work {
           .toList(),
       isPaid: json['isPaid'] as bool?,
       totalAmount: json['totalAmount'] as int?,
+      lobourCost: json['lobourCost'] as int?,
     );
   }
 

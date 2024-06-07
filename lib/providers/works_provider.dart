@@ -11,6 +11,7 @@ class WorkNotifier extends StateNotifier<List<Work>> {
 
   Future<void> getWorks() async {
     state = await FirebaseService.instance.getAllWorks();
+
   }
 
   void setState(List<Work> state) {

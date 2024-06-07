@@ -225,7 +225,7 @@ class _HomeViewState extends ConsumerState<HomeView> with HomeViewModel {
         ),
         Gap(1.w),
         Text(
-          work.plate.toString(),
+          work.brand.toString(),
           style: context.general.textTheme.bodyLarge!.copyWith(fontSize: 15.sp),
         ),
       ],

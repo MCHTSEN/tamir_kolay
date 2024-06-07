@@ -21,6 +21,7 @@ dependencies:
   freezed_annotation: ^2.4.1
   gap: ^3.0.1
   google_fonts: 6.1.0
+  google_generative_ai: ^0.4.1
   image_picker: ^1.1.1
   intl: ^0.18.1
   json_annotation: ^4.9.0
@@ -48,3 +49,4 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/icons/

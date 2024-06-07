@@ -19,6 +19,7 @@ import 'package:tamir_kolay/utils/animations/bouncing_dots_animation.dart';
 import 'package:tamir_kolay/utils/animations/sizing_dot_animation.dart';
 import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
 import 'package:tamir_kolay/utils/extensions/double_extension.dart';
+import 'package:tamir_kolay/utils/widgets/texts/gradient_text.dart';
 
 class WorkView extends ConsumerStatefulWidget {
   Work workModel;
@@ -516,7 +517,7 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                 builder: (context) {
                   return Dialog(
                       child: Container(
-                    padding: EdgeInsets.all(6.w),
+                    padding: EdgeInsets.all(4.w),
                     child: FutureBuilder(
                         future: GeminiService()
                             .generateContent(widget.workModel.issue!),
@@ -540,12 +541,23 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Yapay Zeka Asistan',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall!
-                                      .copyWith(fontSize: 18.sp),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Yapay Zeka Asistan',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall!
+                                          .copyWith(fontSize: 18.sp),
+                                    ),
+                                    Gap(2.w),
+                                    Image.asset(
+                                      'assets/icons/ic_gemini.png',
+                                      width: 20,
+                                      height: 20,
+                                    )
+                                  ],
                                 ),
                                 Gap(2.h),
                                 Text(
@@ -687,29 +699,3 @@ class _WorkViewState extends ConsumerState<WorkView> with WorkViewModel {
   }
 }
 
-class GradientText extends StatelessWidget {
-  const GradientText(
-    this.text, {
-    super.key,
-    required this.gradient,
-    this.style,
-  });
-
-  final String text;
-  final TextStyle? style;
-  final Gradient gradient;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (bounds) => gradient.createShader(
-        Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-      ),
-      child: Text(
-        text,
-        style: style?.copyWith(color: Colors.white) ??
-            const TextStyle(color: Colors.white),
-      ),
-    );
-  }
-}

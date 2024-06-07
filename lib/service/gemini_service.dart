@@ -4,11 +4,12 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
   late final GenerativeModel _model;
-  final String prePromt = '''
+  final String prePrompt = '''
     Kendini bir teknik servis danismani olarak hayal et. Teknik serviste calisan biri sana geliyor ve sana bir sorununu anlatiyor.
     Bu sorunu çözmek için birkac çözüm önerisi sunman gerekiyor. Bu sorunlarin neden kaynaklandigini da belirtmelisin.
     Musteriye soru sorma senin ile iletisime gecemez ve sana mesaj atamaz.
-    Yazarken yardimci, anlayici ve sabirli olmalisin. Detaylari atlamamalisin. Turkce olarak yazmalisin.
+    Yazarken yardimci, anlayici ve sabirli olmalisin. Detaylari atlamamalisin. Turkce olarak yazmalisin. 
+    Basliklari kalin punto ile yazma. Liste elemanlari icin '-' kullan.
     Şikayet şu şekilde:
 ''';
 
@@ -22,7 +23,7 @@ class GeminiService {
 
   Future<String> generateContent(String text) async {
     try {
-      final content = [Content.text('$prePromt $text')];
+      final content = [Content.text('$prePrompt $text')];
       final response = await _model.generateContent(content);
       return response.text ?? '';
     } catch (e) {
