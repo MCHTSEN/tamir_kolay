@@ -96,6 +96,7 @@ class Work {
     );
   }
 
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

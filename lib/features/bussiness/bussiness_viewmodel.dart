@@ -6,6 +6,7 @@ import 'package:tamir_kolay/models/job_model.dart';
 import 'package:tamir_kolay/providers/works_provider.dart';
 import 'package:tamir_kolay/service/firebase_service.dart';
 import 'package:tamir_kolay/utils/enums/date_type.dart';
+import 'package:tamir_kolay/utils/enums/vehicle_status.dart';
 
 mixin BussinessViewModel on ConsumerState<BussinessView> {
   double totalEarnedMoney = 0;
@@ -34,7 +35,6 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
 
     dailyEarnedMoney = calculateDailyEarnedMoney(works);
 
-    monthlyRate = await FirebaseService.instance.compareMonthlyAmounts();
 
     mounthlyEarnedMoney = monthlyRate['compareEarnedAmount'] ?? 0;
     mounthlyWorksDone = monthlyRate['compareWorksCount'] ?? 0;
@@ -67,22 +67,27 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
   }
 
   String calculateTotalCompletedWorks(List<Work> works) {
-    final filteredWorks =
-        works.where((element) => element.status == 'done').toList();
+    final filteredWorks = works
+        .where((element) => element.status == VehicleStatus.done.name)
+        .toList();
 
     if (filteredWorks.isEmpty) return '0';
 
     return works
-        .where((element) => element.status == 'done')
+        .where((element) => element.status == VehicleStatus.done.name)
         .toList()
         .length
         .toString();
   }
 
+  // double compareMonthlyAmounts(){
+    
+  // }
+
   double calculateDailyEarnedMoney(List<Work> works) {
     final filteredWorks = works
         .where((element) =>
-            element.status == 'done' &&
+            element.status == VehicleStatus.done.name &&
             isSameDay(element.endTime ?? '', DateTime.now().toString()))
         .toList();
 
@@ -95,8 +100,9 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
   }
 
   double calculatedtotalEarnedMoney(List<Work> works) {
-    final filteredWorks =
-        works.where((element) => element.status == 'done').toList();
+    final filteredWorks = works
+        .where((element) => element.status == VehicleStatus.done.name)
+        .toList();
     if (filteredWorks.isEmpty) return 0.0;
 
     return filteredWorks
@@ -108,7 +114,7 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
   double calculateLastMonthEarnedMoney(List<Work> works) {
     final filteredWorks = works
         .where((element) =>
-            element.status == 'done' &&
+            element.status == VehicleStatus.done.name &&
             isSameMonth(element.endTime ?? '', DateTime.now().toString()))
         .toList();
 
@@ -126,7 +132,8 @@ mixin BussinessViewModel on ConsumerState<BussinessView> {
   double calculateAvarageHourToWorkDone(List<Work> works) {
     final filteredWorks = works
         .where((element) =>
-            element.status == 'done' && element.endTime!.isNotEmpty)
+            element.status == VehicleStatus.done.name &&
+            element.endTime!.isNotEmpty)
         .toList();
 
     if (filteredWorks.isEmpty) {

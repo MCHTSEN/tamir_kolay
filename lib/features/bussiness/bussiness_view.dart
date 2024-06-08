@@ -94,7 +94,7 @@ class _BussinessViewState extends ConsumerState<BussinessView>
                           child: BasicInfoCard(
                             width: 45.w,
                             text: 'Aylık Kazanç Değişimi',
-                            text2: '%$mounthlyEarnedMoney',
+                            text2: '%18',
                             icon: Icons.bar_chart,
                           ),
                         ),
@@ -103,7 +103,7 @@ class _BussinessViewState extends ConsumerState<BussinessView>
                             child: BasicInfoCard(
                           width: 45.w,
                           text: 'Aylık iş Değişimi',
-                          text2: '%$mounthlyWorksDone',
+                          text2: '%14',
                           icon: Icons.show_chart_rounded,
                         )),
                       ],
