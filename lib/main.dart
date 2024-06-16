@@ -10,6 +10,7 @@ import 'package:tamir_kolay/features/home/home_view.dart';
 import 'package:tamir_kolay/features/payment/payment_view.dart';
 import 'package:tamir_kolay/features/vehicle_registration/vehicle_registration_view.dart';
 import 'package:tamir_kolay/firebase_options.dart';
+import 'package:tamir_kolay/sandbox.dart';
 import 'package:tamir_kolay/utils/constants/api_keys.dart';
 import 'package:tamir_kolay/utils/theme/color_theme.dart';
 import 'package:tamir_kolay/utils/theme/text_theme.dart';
@@ -34,7 +35,7 @@ class MainApp extends StatelessWidget {
     return ResponsiveSizer(
       builder: (context, orientation, deviceType) {
         return MaterialApp(
-          home: const AuthenticationView(),
+          home: const Sandbox(),
           routes: {
             '/payment': (context) => const PaymentView(),
             '/registration': (context) => const VehicleRegistrationView(),
